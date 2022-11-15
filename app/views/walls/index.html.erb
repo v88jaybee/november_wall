@@ -1,0 +1,57 @@
+<div id="new_message_div">
+    <h2>Post a Message</h2>
+
+    <form id="message_form" action="/create_message" method="post">
+        <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token%>">
+        <textarea name="message[message_text]" ></textarea>
+        <input type="submit" value="Post a Message">
+    </form>
+
+    <div id="all_message_div">
+        <div class="message_container">
+            <% if @all_messages.present? %>
+                <% @all_messages.each do |message| %>
+                    <h4><%= message['message'] %></h4>
+                    <% if message['user_id'] == @current_user["id"] %>
+                        <form class="delete_message_form" action="/delete_message" method="post">
+                            <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token%>">
+                            <input type="hidden" name="message[message_id]" value="<%= message['message_id'] %>">
+                            <input type="submit" value="x">
+                        </form>
+                    <% end %>
+                    <p><%= message['author_message'] %> - <%= message['created_at'] %></p>
+
+                    <div class="comment_div">
+                        <form class="comment_form" action="/create_comment" method="post">
+                            <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token%>">
+                            <input type="hidden" name="comment[message_id]" value="<%= message['message_id'] %>">
+                            <textarea name="comment[comment_text]" ></textarea>
+                            <input type="submit" value="Post a Comment">
+                        </form>
+
+                        <% all_comments = JSON.parse message['user_comments'] %>
+
+                        <ul>
+                            <% if all_comments.present? %>
+                                <% all_comments.each do |comment| %>
+                                    <li>
+                                        <h5><%= comment['comment'] %></h5>
+                                        <% if comment['comment_user_id'] == @current_user["id"] %>
+                                            <form class="delete_comment_form" action="/delete_comment" method="post">
+                                                <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token%>">
+                                                <input type="hidden" name="comment[comment_id]" value="<%= comment['comment_id'] %>">
+                                                <input type="submit" value="x">
+                                            </form>
+                                        <% end %>
+                                        <p><%= comment['author_comment'] %> - <%= comment['created_at'] %></p>
+                                    </li>
+                                <% end %>
+                            <% end %>
+                        </ul>
+                    </div>
+
+                <% end %>
+            <% end %>
+        </div>
+    </div>
+</div>
